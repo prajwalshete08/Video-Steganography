@@ -3,7 +3,7 @@ from Crypto.Cipher import PKCS1_OAEP
 import base64
 import sys
 def encrypt(message,key_path):
-    # set public key path 
+   
     public_key_path = key_path
     public_key = RSA.importKey(open(public_key_path, 'r').read())
     # creating the RSA object using public key
@@ -12,8 +12,8 @@ def encrypt(message,key_path):
     cipher_text = base64.b64encode(cipher_text)
     return cipher_text
 def decrypt(message):
-    # set private key path 
-    private_key_path = './keys/private_key_5000.pem'
+
+    private_key_path = './keys/private_key_1024.pem' 
     private_key = RSA.importKey(open(private_key_path, 'r').read())
     # creating the RSA object using private key
     rsa_object = PKCS1_OAEP.new(private_key)

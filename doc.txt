@@ -1,0 +1,1 @@
+System Design is the process of defining the architecture, components, data flow, and interactions of a large-scale software system to meet specific functional and non-functional requirements.

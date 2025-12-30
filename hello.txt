@@ -1,0 +1,3 @@
+Hello 
+Excellent question — and very relevant for your video steganography project, The WebSocket protocol is a communication protocol that provides full-duplex (two-way) communication between a client (usually a web browser) and a server over a single, long-lived TCP connection.
+

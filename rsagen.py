@@ -1,29 +1,65 @@
+# key_generator.py
+
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP
+from termcolor import cprint
 import os
-def generate_keys(key_size):
-    private_keys_path = './keys/private_key_1024.pem'
-    isFileprivate = os.path.isfile(private_keys_path)
-    public_keys_path = './keys/public_key_1024.pem'
-    isFilepublic = os.path.isfile(public_keys_path)
-    if isFileprivate & isFilepublic is True:
-        print("Public and private keys are  created")
-    else :
-    # generating a key pair of public and private key for given size   
-        key_pair = RSA.generate(key_size)
+
+def generate_rsa_keys(key_size=2048, filename_prefix="new_user"):
+    """
+    Generates a private/public RSA key pair and saves them to a 'keys' subdirectory.
     
-    # storing private key in file name as private_key_{keysize}.pem 
-        file_obj = open("./keys/private_key_"+str(key_size)+".pem", "wb")
-        file_obj.write(key_pair.exportKey('PEM'))
-        file_obj.close()
+    Args:
+        key_size (int): The size of the RSA modulus in bits (e.g., 2048).
+        filename_prefix (str): Prefix for the output files (e.g., 'new_user').
+    """
     
-        pubkey = key_pair.publickey()
+    # --- 1. Define and Create Keys Directory ---
+    KEYS_DIR = "keys"
+    try:
+        # Create the 'keys' directory if it doesn't exist
+        os.makedirs(KEYS_DIR, exist_ok=True)
+        cprint(f"[INFO] Keys directory '{KEYS_DIR}' ensured.", 'blue')
+    except Exception as e:
+        cprint(f"[FATAL ERROR] Could not create directory '{KEYS_DIR}': {e}", 'red')
+        return
+
+    cprint(f"\n--- Generating {key_size}-bit RSA Key Pair ---", 'cyan')
     
-    # storing public key in file name as public_key_{keysize}.pem    
-        file_obj = open("./keys/public_key_"+str(key_size)+".pem", "wb")
-        file_obj.write(pubkey.exportKey('OpenSSH'))
-        file_obj.close()
-        print("Public and Private keys are created and stored inside keys folder.")
-if __name__ == '__main__':
-    key_size = 5000
-    generate_keys(key_size)
+    # 2. Generate the private key
+    key = RSA.generate(key_size)
+    
+    # 3. Extract the public key
+    public_key = key.publickey()
+    
+    # Define file names inside the KEYS_DIR
+    private_filename = f"{filename_prefix}_private_{key_size}.pem"
+    public_filename = f"{filename_prefix}_public_{key_size}.pem"
+    
+    private_file_path = os.path.join(KEYS_DIR, private_filename)
+    public_file_path = os.path.join(KEYS_DIR, public_filename)
+    
+    # 4. Save Private Key (PKCS#8 format is common and secure)
+    try:
+        with open(private_file_path, 'wb') as f:
+            # Export the private key in PEM format
+            f.write(key.export_key('PEM'))
+        cprint(f"[SUCCESS] Private key saved to: {os.path.abspath(private_file_path)}", 'green')
+    except Exception as e:
+        cprint(f"[ERROR] Could not save private key: {e}", 'red')
+        return
+
+    # 5. Save Public Key
+    try:
+        with open(public_file_path, 'wb') as f:
+            # Export the public key in PEM format
+            f.write(public_key.export_key('PEM'))
+        cprint(f"[SUCCESS] Public key saved to: {os.path.abspath(public_file_path)}", 'green')
+    except Exception as e:
+        cprint(f"[ERROR] Could not save public key: {e}", 'red')
+
+
+if __name__ == "__main__":
+    # Keys will be saved in the new 'keys' directory:
+    # keys/stego_rsa_private_2048.pem
+    # keys/stego_rsa_public_2048.pem
+    generate_rsa_keys(key_size=2048, filename_prefix="stego_rsa")
